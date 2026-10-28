@@ -1,0 +1,70 @@
+name: Build desktop installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*.*.*"]
+
+jobs:
+  mac:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: npm ci
+      - run: npm test
+      - run: python -m pip install opencc-python-reimplemented==0.1.7
+      - run: python -m unittest discover -s tests -p 'test_*.py'
+      - run: python scripts/prepare-runtime.py --platform mac --arch arm64
+      - run: npm run dist:mac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-arm64
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: npm ci
+      - run: npm test
+      - run: python -m pip install opencc-python-reimplemented==0.1.7
+      - run: python -m unittest discover -s tests -p 'test_*.py'
+      - run: python scripts/prepare-runtime.py --platform win --arch x64
+      - run: npm run dist:win
+      - name: Check packaged Windows FFmpeg license and build flags
+        shell: pwsh
+        run: |
+          $ffmpeg = "dist/win-unpacked/resources/runtime/ffmpeg.exe"
+          $report = "dist/win-unpacked/resources/runtime/FFMPEG-LICENSE.txt"
+          if (-not (Test-Path $ffmpeg)) { throw "Packaged ffmpeg.exe not found at $ffmpeg" }
+          & $ffmpeg -L *> $report
+          if ($LASTEXITCODE -ne 0) { throw "Packaged ffmpeg.exe -L exited with code $LASTEXITCODE" }
+          if (Select-String -Path $report -Pattern '--enable-nonfree|not legally redistributable' -Quiet) { throw "Packaged FFmpeg build is marked nonfree" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: win-x64
+          path: |
+            dist/*.exe
+            dist/win-unpacked/resources/runtime/FFMPEG-LICENSE.txt
+          if-no-files-found: error

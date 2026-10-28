@@ -1,0 +1,7 @@
+openai-whisper==20250625
+# Torch 2.9+ has had Windows c10.dll initialization failures on some systems.
+# Keep the Windows CPU transcription runtime on the known-good 2.8 line.
+torch==2.8.0; platform_system == "Windows"
+sherpa-onnx==1.13.8
+certifi>=2024.8.30
+opencc-python-reimplemented==0.1.7

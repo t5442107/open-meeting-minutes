@@ -1,0 +1,7 @@
+# Windows x64 CUDA 12.6 runtime for NVIDIA GPUs with compute capability < 7.5.
+
+openai-whisper==20250625
+torch==2.8.0+cu126; platform_system == "Windows"
+sherpa-onnx==1.13.8
+certifi>=2024.8.30
+opencc-python-reimplemented==0.1.7

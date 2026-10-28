@@ -1,0 +1,100 @@
+{
+  "name": "huiyi-jiyao",
+  "version": "0.2.33",
+  "author": "Huiyi Jiyao contributors",
+  "description": "跨平台本地会议录音、实时转写、发言人区分与 AI 纪要工具",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "npm run dist:mac",
+    "dist:mac": "node scripts/build-mac.js",
+    "dist:win": "node scripts/build-win.js",
+    "icons:generate": "node scripts/generate-app-icons.js",
+    "test": "node --test tests/storage-recording.test.js",
+    "test:desktop": "electron tests/electron-smoke.cjs"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.codex.huijiyijao",
+    "productName": "会议纪要助手",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js",
+      "styles.css",
+      "audio-worklet.js",
+      "lib/**"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!**/__pycache__/**",
+          "!**/*.pyc"
+        ]
+      },
+      {
+        "from": "runtime/${os}-${arch}",
+        "to": "runtime",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "THIRD_PARTY_NOTICES.md",
+        "to": "THIRD_PARTY_NOTICES.md"
+      },
+      {
+        "from": "licenses",
+        "to": "licenses",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "icon": "build/app-icon.icns",
+      "identity": null,
+      "hardenedRuntime": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "会议纪要助手需要麦克风来录制现场会议并进行实时转写。",
+        "NSAudioCaptureUsageDescription": "会议纪要助手需要音频输入来录制会议。"
+      }
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signExecutable": false,
+      "icon": "build/app-icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/app-icon.ico",
+      "uninstallerIcon": "build/app-icon.ico",
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "dependencies": {
+    "opencc-js": "1.4.2"
+  }
+}

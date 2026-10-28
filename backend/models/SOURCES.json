@@ -1,0 +1,38 @@
+{
+  "segmentation.onnx": {
+    "model": "pyannote/segmentation-3.0 (sherpa-onnx ONNX export)",
+    "license": "MIT",
+    "source": "https://huggingface.co/csukuangfj/sherpa-onnx-pyannote-segmentation-3-0/blob/main/model.onnx",
+    "sha256": "220ad67ca923bef2fa91f2390c786097bf305bceb5e261d4af67b38e938e1079"
+  },
+  "embedding.onnx": {
+    "model": "3D-Speaker ERes2Net base zh-cn 16k",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/csukuangfj/speaker-embedding-models/blob/main/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
+    "sha256": "1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b"
+  },
+  "live-asr/encoder.int8.onnx": {
+    "model": "sherpa-onnx streaming Paraformer bilingual zh-en",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-paraformer-bilingual-zh-en/blob/main/encoder.int8.onnx",
+    "sha256": "81a70226a8934e6ed92aa1d4fc486b428b5398e2f2619ed4897b7294cab90e9a"
+  },
+  "live-asr/decoder.int8.onnx": {
+    "model": "sherpa-onnx streaming Paraformer bilingual zh-en",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-paraformer-bilingual-zh-en/blob/main/decoder.int8.onnx",
+    "sha256": "f3cca9f77bb9d93c8fcbfb63ae617b6b1ee96818df3aa3b151c40658fe38594f"
+  },
+  "live-asr/tokens.txt": {
+    "model": "sherpa-onnx streaming Paraformer bilingual zh-en",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-paraformer-bilingual-zh-en/blob/main/tokens.txt",
+    "sha256": "59aba8873a2ed1e122c25fee421e25f283b63290efbde85c1f01a853d83cb6e6"
+  },
+  "live-asr/punctuation/model.int8.onnx": {
+    "model": "CT-Transformer Chinese/English punctuation INT8",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/lorneluo/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/blob/main/model.int8.onnx",
+    "sha256": "65a3fb9f5ad7bfb96bf69e0dc4481df97f6ee60513c1d94ce981ba6effd524b1"
+  }
+}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' file: blob:; connect-src 'self' https: http:; worker-src 'self' blob:;" />
+  <title>会记 · 会议工作台</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">会</div><div><strong>会记</strong><span>让每次讨论都有回响</span></div></div>
+      <button class="new-button" id="newMeeting"><span>＋</span> 新建会议</button>
+      <div class="side-label">工作区</div>
+      <button class="nav-item active" id="workspaceNav"><span class="nav-icon">▤</span> 当前会议</button>
+      <div class="history-heading"><span>历史会议</span><span id="historyCount">0</span></div>
+      <label class="search-box"><span>⌕</span><input id="historySearch" type="search" placeholder="搜索会议…" autocomplete="off" /><kbd>⌘ K</kbd></label>
+      <div class="history-list" id="historyList"></div>
+      <div class="sidebar-bottom"><span class="status-dot"></span><span>录音与转写均在本机处理</span><button class="settings" id="openSettings" title="设置" aria-label="设置">⚙</button></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="breadcrumb">工作区 <span>/</span> <b id="breadcrumbTitle">新建会议</b></div><div class="top-actions"><span class="local-badge"><i></i> 私密工作区</span><button class="icon-button" id="headerSettings" title="设置">⚙</button></div></header>
+      <section class="content">
+        <div class="page-heading"><div><div class="eyebrow">MEETING WORKSPACE</div><h1 id="pageTitle">把讨论，变成下一步</h1><p>实时记录对话，自动整理重点，让每个决定都有着落。</p></div><div class="page-heading-actions"><button class="quiet-button" id="posterButton" disabled>生成图片 <span>✦</span></button><button class="quiet-button" id="exportButton" disabled>导出纪要 <span>↓</span></button></div></div>
+        <section class="operation-bar hidden" id="operationBar" aria-live="polite"><span class="operation-spinner" id="operationSpinner"></span><div class="operation-copy"><strong id="operationText">正在处理…</strong><span id="operationError" class="hidden"></span><div class="startup-progress hidden" id="startupProgress"><div class="startup-steps" id="startupSteps">准备运行环境　›　安装组件　›　下载语音模型　›　加载模型</div><div class="startup-progress-track" id="startupProgressTrack" role="progressbar" aria-label="语音模型下载进度" aria-valuemin="0" aria-valuemax="100"><i id="startupProgressFill"></i></div><div class="startup-progress-details" id="startupProgressDetails" aria-live="polite"></div></div><div class="startup-progress inference-progress hidden" id="inferenceProgress"><div class="startup-steps" id="inferenceProgressLabel"></div><div class="startup-progress-track" id="inferenceProgressTrack" role="progressbar" aria-label="本机转写进度" aria-valuemin="0" aria-valuemax="100"><i id="inferenceProgressFill"></i></div><div class="startup-progress-details" id="inferenceProgressDetails" aria-live="polite"></div></div></div><button class="quiet-button" id="cancelOperationButton">取消处理</button><button class="operation-dismiss hidden" id="dismissOperation" aria-label="关闭提示">×</button></section>
+        <div class="workspace-columns" id="workspaceColumns">
+        <div class="workspace-primary">
+        <section class="setup-card" id="setupCard">
+          <div class="setup-top"><div><div class="section-kicker">新会议</div><h2>准备开始记录</h2><p>选择现场录音，或导入已有音频进行本机转写并生成纪要。</p></div><div class="audio-actions"><button class="quiet-button" id="chooseAudio">上传音频 <span>↑</span></button><button class="quiet-button" id="transcribeButton" disabled>转写音频 <span>→</span></button></div></div>
+          <label class="title-field"><span>会议主题</span><input id="meetingTitle" maxlength="120" placeholder="例如：产品周会 · 10 月 23 日" /></label>
+          <div class="record-options">
+            <label><span>转写语言</span><select id="language"><option value="zh">简体中文</option><option value="auto">自动识别</option><option value="en">英语</option></select></label>
+            <label><span>识别模型</span><select id="model"><option value="large-v3-turbo">Large v3 Turbo · 高准确</option><option value="small">Small · 均衡</option><option value="base">Base · 轻量</option></select><small class="model-hint">Large 准确度较高，但长录音处理较慢；优先速度可选 Small。模型按所选项运行，耗时因设备和录音而异。</small></label>
+            <label><span>会后处理</span><select id="finalizeStrategy"><option value="fast">快速完成 · 复用实时文字</option><option value="full">全文校正 · 较慢，改善上下文</option></select></label>
+            <label><span>说话人数</span><select id="speakers"><option value="-1">录音时自动区分</option><option value="2">2 人</option><option value="3">3 人</option><option value="4">4 人</option><option value="5">5 人</option><option value="6">6 人</option><option value="7">7 人</option><option value="8">8 人</option></select></label>
+            <label class="gpu-device-option hidden" id="gpuDeviceOption"><span>转写设备</span><select id="transcriptionDevice"><option value="cpu">CPU</option><option value="cuda">NVIDIA GPU</option></select><small class="model-hint" id="gpuDeviceName"></small></label>
+            <label class="gpu-device-option hidden" id="speakerDeviceOption"><span>声纹区分设备</span><select id="speakerDevice"><option value="cpu">CPU</option><option value="cuda">NVIDIA GPU（当前自动回退 CPU）</option></select><small class="model-hint">当前版本的声纹匹配使用 CPU，避免启动时联网下载额外组件。</small></label>
+            <label><span>纪要风格</span><select id="style"><option value="简洁清晰">简洁清晰</option><option value="详细完整">详细完整</option><option value="行动导向">行动导向</option></select></label>
+          </div>
+          <div class="setup-bottom"><div class="privacy-note"><span>◈</span> 录音与转写留在本机 · 停止录音后自动将逐字稿发送至 AI 服务生成纪要</div><button class="record-button" id="recordButton"><span class="record-dot"></span><span id="recordButtonText">开始录音</span></button></div>
+          <div class="import-file hidden" id="importFile"><span class="file-glyph">♫</span><div><strong id="fileName"></strong><small id="fileMeta"></small></div><button class="icon-button" id="removeAudio" title="移除音频">×</button><ol class="audio-queue hidden" id="audioQueueList"></ol><div class="playback-controls" id="playbackControls"><button class="playback-toggle" id="playAudioButton" type="button" disabled>▶ 播放</button><span class="playback-time" id="playbackCurrent">00:00</span><input id="playbackSeek" type="range" min="0" max="0" step="0.1" value="0" aria-label="录音播放进度" disabled /><span class="playback-time" id="playbackDuration">--:--</span></div><audio id="audioPlayer" preload="metadata"></audio></div>
+        </section>
+        <section class="panel recording-summary hidden" id="recordingSummaryPanel"><div class="panel-heading"><div><span class="panel-icon">✦</span><h3>会议纪要</h3></div><span class="panel-caption">录音停止后自动整理</span></div><p>正在实时转写并匹配发言人。结束录音后直接使用已识别的文字和声纹结果整理纪要。</p></section>
+        <section class="meeting-view hidden" id="meetingView">
+          <div class="meeting-toolbar"><div class="meeting-meta"><span class="status-pill" id="meetingStatus">已完成</span><span id="meetingDate"></span><span id="meetingDuration"></span></div><div class="toolbar-actions"><button class="quiet-button hidden" id="retryButton">↻ 重新处理录音</button><button class="quiet-button" id="saveButton">保存</button></div></div>
+          <div class="meeting-playback hidden" id="meetingPlayback"></div>
+          <div class="ai-banner" id="aiBanner"><div class="ai-spark">✦</div><div><strong>转写完成，开始整理会议结果</strong><p>AI 将根据逐字稿生成摘要、重点和待办；录音结束后自动开始。</p></div><button class="primary-button" id="generateButton">生成会议纪要 <span>→</span></button></div>
+          <div class="notes-grid">
+            <section class="panel summary-panel"><div class="panel-heading"><div><span class="panel-icon">✦</span><h3>会议摘要</h3></div><span class="panel-caption" id="summaryCaption">等待生成</span></div><div id="summaryContent" class="summary-content"><p class="muted">生成后，会议结论会显示在这里。</p></div></section>
+            <section class="panel highlights-panel"><div class="panel-heading"><div><span class="panel-icon">◉</span><h3>讨论重点</h3></div><span class="panel-caption">KEY POINTS</span></div><div id="highlightsContent" class="highlights-content"><p class="muted">提炼出的重点会显示在这里。</p></div></section>
+            <section class="panel todos-panel"><div class="panel-heading"><div><span class="panel-icon">✓</span><h3>待办事项</h3></div><span class="panel-caption" id="todoCount">0 项</span></div><div id="todosContent" class="todos-content"><p class="muted">会议行动项会显示在这里。</p></div></section>
+            <section class="panel notes-panel"><div class="panel-heading"><div><span class="panel-icon">≡</span><h3>会议纪要</h3></div><span class="panel-caption">可编辑 · 自动保存</span></div><textarea id="notesEditor" placeholder="可以在这里补充或编辑会议纪要…"></textarea></section>
+          </div>
+        </section>
+        <div class="empty-state" id="emptyState"><span>✳</span> 开始一场录音，或导入已有音频</div>
+        </div>
+        <aside class="workspace-aside">
+        <section class="recording-card hidden" id="recordingCard" aria-live="polite">
+          <div class="recording-head"><div class="recording-indicator"><span></span><b id="recordingState">正在录音</b></div><time id="recordingClock">00:00</time><button class="stop-button" id="stopButton"><span>■</span> 结束录音</button></div>
+          <div class="waveform" id="waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="progress-wrap hidden" id="progressWrap"><span id="progressText">正在处理…</span></div>
+        </section>
+        <section class="panel transcript-panel" id="transcriptPanel"><div class="panel-heading transcript-heading"><div><span class="panel-icon">◷</span><h3>逐字稿</h3></div><div class="transcript-tools"><span id="transcriptCount">0 段</span><button class="text-button" id="renameSpeakers">编辑发言人</button></div></div><div id="speakerEditor" class="speaker-editor hidden"></div><div id="transcriptList" class="transcript-list"><p class="muted">录音转写后，逐字稿会显示在这里。</p></div></section>
+        <section class="panel live-transcript-panel hidden" id="liveTranscriptPanel"><div class="panel-heading"><div><span class="panel-icon">●</span><h3>实时转写</h3></div><span class="panel-caption" id="liveSpeakerStatus">实时声纹匹配准备中</span></div><div class="live-label"><span class="pulse-dot"></span><span id="liveStatus">正在连接麦克风…</span></div><div class="live-transcript" id="liveTranscript"><p class="placeholder">开始说话后，带标点和发言人标记的文字会显示在这里</p></div></section>
+        </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="modal-backdrop hidden" id="settingsModal"><section class="settings-modal"><button class="modal-close" id="closeSettings">×</button><div class="eyebrow">PREFERENCES</div><h2>AI 服务设置</h2><p>可配置兼容服务的地址、模型和 API 密钥。录音与本地转写不会发送到 AI 服务；停止录音后，逐字稿会自动发送至所配置的服务生成纪要。</p><label>AI 服务<select id="apiProvider"><option value="openai">OpenAI</option><option value="deepseek">DeepSeek</option><option value="custom">自定义 OpenAI 兼容服务</option></select></label><label>服务地址<input id="apiEndpoint" placeholder="https://api.openai.com/v1" /></label><label>模型名称<input id="apiModel" placeholder="例如 gpt-6-luna" /></label><label>API 密钥<input id="apiKey" type="password" placeholder="输入 API 密钥" /></label><div id="deepseekBalance" class="balance-card hidden"><div class="balance-heading"><strong>DeepSeek 账户余额</strong><button type="button" id="refreshDeepSeekBalance">刷新余额</button></div><div id="deepseekBalanceStatus" role="status">点击刷新以查询余额</div><div id="deepseekBalanceDetails"></div></div><div class="modal-footer"><span id="settingsStatus"></span><button class="primary-button" id="saveSettings">保存设置</button></div></section></div>
+  <div class="modal-backdrop poster-backdrop hidden" id="posterModal" role="dialog" aria-modal="true" aria-label="会议图片预览"><section class="poster-modal"><header class="poster-modal-head"><div class="poster-modal-toolbar"><div><strong>会议图片预览</strong><span id="posterCaption">PNG · 简体中文</span></div><div><button class="quiet-button" id="savePosterButton" disabled>保存图片</button><button class="modal-close poster-close" id="closePoster" aria-label="关闭">×</button></div></div><div class="poster-title-edit"><label for="posterTitleInput">图片标题</label><input id="posterTitleInput" maxlength="120" /><button class="quiet-button" id="applyPosterTitle">更新预览</button></div></header><div class="poster-preview-scroll" id="posterPreview"><div class="poster-loading">正在生成图片…</div></div></section></div>
+  <div class="toast hidden" id="toast" role="status"></div>
+  <script src="renderer.js"></script>
+</body>
+</html>
